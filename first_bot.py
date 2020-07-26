@@ -25,11 +25,10 @@ def start(message):
    
    
 @bot.message_handler(commands=['select'])
-def start(message):
+def select_db(message):
     select_all_user = sql_db(db_connect).select_all()
-    
-    msg = select_all_user
-    bot.send_message(message.from_user.id, msg);
+    # send_message не отправляет списки/словари, поэтому приводим к строке                     
+    bot.send_message(message.from_user.id, str(select_all_user))
 
 
 @bot.message_handler(content_types=['text'])

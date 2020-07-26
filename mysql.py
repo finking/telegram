@@ -23,7 +23,8 @@ class sql_db:
         else:
             data = {}
             for i in result:
-                data.update({i[1]:i[2]})
+                # ключ - id в бд, значение список из имени, фамилии и возраста
+                data.update({i[0]:[i[1], i[2], i[3]]})
             return data
 
 
@@ -35,16 +36,3 @@ class sql_db:
         except pymysql.Error:
             print("can't insert info in line_answer")
         self.conn.commit()
-
-
-def main():
-    sql = sql_db()
-    # print(sql.select_all())
-    # b = sql.select_all()
-    # print(b.keys())
-    # if 'ETC1' in b.keys():
-        # print('da')
-
-
-if __name__ == "__main__":
-    main()
