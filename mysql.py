@@ -1,9 +1,9 @@
 import pymysql
 
 class sql_db:
-    def __init__(self, host, user, password, db):
+    def __init__(self, db_connect):
         try:
-            self.conn = pymysql.connect(host, user, password, db, use_unicode=True, charset='utf8')
+            self.conn = pymysql.connect(*db_connect, use_unicode=True, charset='utf8')
         except pymysql.OperationalError:
             print("can't find base")
         try:

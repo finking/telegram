@@ -13,6 +13,7 @@ host = setting_dict['host']
 user = setting_dict['user']
 password = setting_dict['passwd'] 
 db = setting_dict['db']
+db_connect = [host, user, password, db]
 
 bot = telebot.TeleBot(API_TOKEN)
 
@@ -25,7 +26,7 @@ def start(message):
    
 @bot.message_handler(commands=['select'])
 def start(message):
-    select_all_user = sql_db(host, user, password, db).select_all()
+    select_all_user = sql_db(db_connect).select_all()
     
     msg = select_all_user
     bot.send_message(message.from_user.id, msg);
@@ -87,7 +88,7 @@ def write_bd(message):
     msg = message.text      
     if (msg == u"Да"):            
         user = user_dict[from_user_id]
-        sql_db(host, user, password, db).insert_user(user.name, user.surname, user.age)
+        sql_db(db_connect).insert_user(user.name, user.surname, user.age)
         bot.send_message(from_user_id, 'Запомнил :)')
     elif (msg == u"Нет"):   
         bot.send_message(from_user_id, 'Не буду запоминать :)')
