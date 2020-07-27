@@ -3,9 +3,12 @@ import telebot
 from telebot import types
 from mysql import sql_db
 from user import User
+from utils import LOGGER
 import config
+import traceback
 
 user_dict = {}
+
 setting_dict = config.load_settings()
 
 API_TOKEN = setting_dict['api_token']
@@ -40,7 +43,7 @@ def reg(message):
         bot.send_message(message.from_user.id, 'Напиши /reg')
    
 
-def get_name(message): #получаем фамилию
+def get_name(message): #получаем имя
     try:    
         from_user_id = message.from_user.id
         name = message.text
@@ -49,7 +52,9 @@ def get_name(message): #получаем фамилию
         bot.send_message(from_user_id, 'Какая у тебя фамилия?')
         bot.register_next_step_handler(message, get_surname)
     except Exception as e:
-        bot.reply_to(message, f'oooops. Error: {e}')
+        bot.reply_to(message, f'oooops. Что-то пошло не так. Мы уже работаем над этим!')
+        LOGGER.error(f'Возникла ошибка при получение имени: {e}')
+        LOGGER.debug(traceback.format_exc())
 
 def get_surname(message):
     try:
@@ -60,7 +65,9 @@ def get_surname(message):
         bot.send_message(from_user_id, 'Сколько тебе лет?')
         bot.register_next_step_handler(message, get_age)
     except Exception as e:
-        bot.reply_to(message, f'oooops. Error: {e}')
+        bot.reply_to(message, f'oooops. Что-то пошло не так. Мы уже работаем над этим!')
+        LOGGER.error(f'Возникла ошибка при получение фамилии: {e}')
+        LOGGER.debug(traceback.format_exc())
 
 def get_age(message):
     try:
@@ -79,23 +86,28 @@ def get_age(message):
         bot.register_next_step_handler(message, write_bd)
 
     except Exception as e:
-        bot.reply_to(message, f'oooops. Error: {e}')     
+        bot.reply_to(message, f'oooops. Что-то пошло не так. Мы уже работаем над этим!')
+        LOGGER.error(f'Возникла ошибка при получение возраста: {e}')
+        LOGGER.debug(traceback.format_exc())   
 
 def write_bd(message):
-    # try:  
-    from_user_id = message.chat.id
-    msg = message.text      
-    if (msg == u"Да"):            
-        user = user_dict[from_user_id]
-        sql_db(db_connect).insert_user(user.name, user.surname, user.age)
-        bot.send_message(from_user_id, 'Запомнил :)')
-    elif (msg == u"Нет"):   
-        bot.send_message(from_user_id, 'Не буду запоминать :)')
-    else:
-        print('Error in definions yes/no')
-        raise Exception()
-    # except Exception as e:
-        # bot.reply_to(message, f'oooops. Error: {e}') 
+    try:  
+        from_user_id = message.chat.id
+        msg = message.text      
+        if (msg == u"Да"):            
+            user = user_dict[from_user_id]
+            sql_db(db_connect).insert_user(user.name, user.surname, user.age)
+            bot.send_message(from_user_id, 'Запомнил :)')
+            LOGGER.info(f'Запись в бд: имя пользователя={user.name}, фамилия={user.surname}, возраст={user.age}')
+        elif (msg == u"Нет"):   
+            bot.send_message(from_user_id, 'Не буду запоминать :)')
+        else:
+            print('Error in definions yes/no')
+            raise Exception()
+    except Exception as e:
+        bot.reply_to(message, f'oooops. Что-то пошло не так. Мы уже работаем над этим!')
+        LOGGER.error(f'Возникла ошибка при записи в базу данных: {e}')
+        LOGGER.debug(traceback.format_exc())
         
 bot.polling(none_stop=True, interval=0)  
 
