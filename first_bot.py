@@ -72,7 +72,7 @@ def get_age(message):
             return
         user = user_dict[from_user_id]
         user.age = age
-        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True) #наша клавиатура
+        keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True) #наша клавиатура
         keyboard.add("Да", "Нет")
         question = f'Тебе {str(user.age)} лет, тебя зовут {user.name} {user.surname}?'
         bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)            
